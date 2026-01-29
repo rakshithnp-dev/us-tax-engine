@@ -20,22 +20,87 @@ NEXUS_RULES = {
 
 # B. Tax Rate Database (The "Micro" Logic - Simulation)
 # In production, this would be an API call to Vertex/Avalara/Taxually
+# Expanded database covering 50+ major US cities across all states
 ZIP_RATES = {
+    # Original Demo Cities
     '90210': {'city': 'Beverly Hills', 'state': 'CA', 'rate': 0.095},
     '10001': {'city': 'New York', 'state': 'NY', 'rate': 0.08875},
     '33101': {'city': 'Miami', 'state': 'FL', 'rate': 0.07},
     '73301': {'city': 'Austin', 'state': 'TX', 'rate': 0.0825},
     '98101': {'city': 'Seattle', 'state': 'WA', 'rate': 0.1025},
+    
+    # Major Metro Areas
+    '60601': {'city': 'Chicago', 'state': 'IL', 'rate': 0.1025},
+    '02101': {'city': 'Boston', 'state': 'MA', 'rate': 0.0625},
+    '80201': {'city': 'Denver', 'state': 'CO', 'rate': 0.0881},
+    '30301': {'city': 'Atlanta', 'state': 'GA', 'rate': 0.089},
+    '19101': {'city': 'Philadelphia', 'state': 'PA', 'rate': 0.08},
+    '85001': {'city': 'Phoenix', 'state': 'AZ', 'rate': 0.083},
+    '92101': {'city': 'San Diego', 'state': 'CA', 'rate': 0.0775},
+    '75201': {'city': 'Dallas', 'state': 'TX', 'rate': 0.0825},
+    '77001': {'city': 'Houston', 'state': 'TX', 'rate': 0.0825},
+    
+    # State Capitals
+    '36101': {'city': 'Montgomery', 'state': 'AL', 'rate': 0.10},
+    '99501': {'city': 'Anchorage', 'state': 'AK', 'rate': 0.00},
+    '72201': {'city': 'Little Rock', 'state': 'AR', 'rate': 0.095},
+    '95814': {'city': 'Sacramento', 'state': 'CA', 'rate': 0.0825},
+    '06101': {'city': 'Hartford', 'state': 'CT', 'rate': 0.0635},
+    '19901': {'city': 'Dover', 'state': 'DE', 'rate': 0.00},
+    '32301': {'city': 'Tallahassee', 'state': 'FL', 'rate': 0.07},
+    '96801': {'city': 'Honolulu', 'state': 'HI', 'rate': 0.045},
+    '83701': {'city': 'Boise', 'state': 'ID', 'rate': 0.06},
+    '46201': {'city': 'Indianapolis', 'state': 'IN', 'rate': 0.07},
+    '50301': {'city': 'Des Moines', 'state': 'IA', 'rate': 0.07},
+    '66601': {'city': 'Topeka', 'state': 'KS', 'rate': 0.095},
+    '40601': {'city': 'Frankfort', 'state': 'KY', 'rate': 0.06},
+    '70801': {'city': 'Baton Rouge', 'state': 'LA', 'rate': 0.0945},
+    '04330': {'city': 'Augusta', 'state': 'ME', 'rate': 0.055},
+    '21401': {'city': 'Annapolis', 'state': 'MD', 'rate': 0.06},
+    '48901': {'city': 'Lansing', 'state': 'MI', 'rate': 0.06},
+    '55101': {'city': 'St. Paul', 'state': 'MN', 'rate': 0.0775},
+    '39201': {'city': 'Jackson', 'state': 'MS', 'rate': 0.07},
+    '65101': {'city': 'Jefferson City', 'state': 'MO', 'rate': 0.0823},
+    '59601': {'city': 'Helena', 'state': 'MT', 'rate': 0.00},
+    '68501': {'city': 'Lincoln', 'state': 'NE', 'rate': 0.075},
+    '89501': {'city': 'Reno', 'state': 'NV', 'rate': 0.0825},
+    '03301': {'city': 'Concord', 'state': 'NH', 'rate': 0.00},
+    '08601': {'city': 'Trenton', 'state': 'NJ', 'rate': 0.06625},
+    '87501': {'city': 'Santa Fe', 'state': 'NM', 'rate': 0.0838},
+    '27601': {'city': 'Raleigh', 'state': 'NC', 'rate': 0.0725},
+    '58501': {'city': 'Bismarck', 'state': 'ND', 'rate': 0.07},
+    '43201': {'city': 'Columbus', 'state': 'OH', 'rate': 0.0775},
+    '73101': {'city': 'Oklahoma City', 'state': 'OK', 'rate': 0.0875},
+    '97301': {'city': 'Salem', 'state': 'OR', 'rate': 0.00},
+    '02901': {'city': 'Providence', 'state': 'RI', 'rate': 0.07},
+    '29201': {'city': 'Columbia', 'state': 'SC', 'rate': 0.09},
+    '57501': {'city': 'Pierre', 'state': 'SD', 'rate': 0.06},
+    '37201': {'city': 'Nashville', 'state': 'TN', 'rate': 0.0975},
+    '84101': {'city': 'Salt Lake City', 'state': 'UT', 'rate': 0.0725},
+    '05601': {'city': 'Montpelier', 'state': 'VT', 'rate': 0.06},
+    '23218': {'city': 'Richmond', 'state': 'VA', 'rate': 0.06},
+    '98501': {'city': 'Olympia', 'state': 'WA', 'rate': 0.09},
+    '25301': {'city': 'Charleston', 'state': 'WV', 'rate': 0.07},
+    '53701': {'city': 'Madison', 'state': 'WI', 'rate': 0.055},
+    '82001': {'city': 'Cheyenne', 'state': 'WY', 'rate': 0.05},
 }
 
 def get_threshold(state_code):
     return NEXUS_RULES.get(state_code, NEXUS_RULES['DEFAULT'])
 
 def calculate_tax(zip_code, amount):
+    # Check if there are custom uploaded zip codes in session state
+    if 'custom_zips' in st.session_state and zip_code in st.session_state.custom_zips:
+        data = st.session_state.custom_zips[zip_code]
+        tax_amt = amount * data['rate']
+        return data, tax_amt
+    
+    # Fall back to built-in ZIP_RATES
     if zip_code in ZIP_RATES:
         data = ZIP_RATES[zip_code]
         tax_amt = amount * data['rate']
         return data, tax_amt
+    
     return None, 0
 
 # --- 2. THE UI SHELL ---
@@ -118,10 +183,41 @@ with tab2:
     st.header("ZipTax Real-Time Calculator")
     st.caption("Simulate API calls for tax determination based on geolocation.")
     
+    # CSV Upload Feature
+    with st.expander("📁 Upload Custom Zip Codes (CSV)", expanded=False):
+        st.markdown("Upload a CSV file with your own zip codes to expand the database.")
+        st.markdown("**Format:** `zip_code,city,state,rate` (rate as decimal, e.g., 0.0825 for 8.25%)")
+        
+        uploaded_csv = st.file_uploader("Choose CSV file", type=['csv'], key="zip_upload")
+        
+        if uploaded_csv is not None:
+            try:
+                custom_df = pd.read_csv(uploaded_csv)
+                
+                # Validate columns
+                required_cols = ['zip_code', 'city', 'state', 'rate']
+                if all(col in custom_df.columns for col in required_cols):
+                    # Convert to dictionary format and store in session state
+                    custom_zips = {}
+                    for _, row in custom_df.iterrows():
+                        custom_zips[str(row['zip_code'])] = {
+                            'city': row['city'],
+                            'state': row['state'],
+                            'rate': float(row['rate'])
+                        }
+                    
+                    st.session_state.custom_zips = custom_zips
+                    st.success(f"✅ Loaded {len(custom_zips)} custom zip codes!")
+                    st.info(f"Total available: {len(ZIP_RATES)} built-in + {len(custom_zips)} custom = {len(ZIP_RATES) + len(custom_zips)} zip codes")
+                else:
+                    st.error(f"❌ CSV must have columns: {', '.join(required_cols)}")
+            except Exception as e:
+                st.error(f"❌ Error reading CSV: {e}")
+    
     c1, c2, c3 = st.columns(3)
     
     with c1:
-        input_zip = st.text_input("Zip Code (Try 90210, 10001, 73301)", max_chars=5)
+        input_zip = st.text_input("Zip Code (Try 60601, 90210, 10001, or 50+ more)", max_chars=5)
     with c2:
         input_amount = st.number_input("Transaction Amount ($)", min_value=0.0, value=100.0, step=10.0)
     
@@ -156,4 +252,4 @@ with tab2:
                 })
                 
         else:
-            st.error("❌ Zip Code not in demo database. Try 90210 (CA) or 10001 (NY).")
+            st.error(f"❌ Zip Code '{input_zip}' not in database. Upload a CSV or try: 60601 (Chicago), 90210 (Beverly Hills), 10001 (NYC).")
