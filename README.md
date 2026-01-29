@@ -11,7 +11,7 @@ An enterprise-grade US Tax Compliance Engine built with Streamlit and Plotly. Th
 
 ## 🚀 Live Demo
 
-🔗 **Deployed on Azure**: [Your Azure URL will be here]
+🔗 **Deployed on Azure**: https://us-tax-engine-hbb8fhbpbya9b2ct.centralindia-01.azurewebsites.net
 
 ## 📋 Prerequisites
 
